@@ -16,4 +16,4 @@ Built with Go + Cobra. Designed to be simple, fast, and easy to extend.
 ### Option A: Install with Go (recommended for Go developers)
 
 ```bash
-go install github.com/davidperjans/opsctl/cmd/opsctl@v0.1.2
+go install github.com/davidperjans/opsctl/cmd/opsctl@v0.1.3
