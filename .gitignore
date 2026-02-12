@@ -1,0 +1,10 @@
+# built binaries
+*.exe
+*.dll
+*.out
+*.test
+
+# optional local folders
+scratch/
+dist/
+bin/
