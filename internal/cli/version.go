@@ -9,8 +9,8 @@ import (
 
 var (
 	version   = "dev"
-	commitSHA = "none"
-	buildDate = "unknown"
+	commitSHA = ""
+	buildDate = ""
 )
 
 func NewVersionCmd() *cobra.Command {
@@ -18,39 +18,50 @@ func NewVersionCmd() *cobra.Command {
 		Use:   "version",
 		Short: "Print version information",
 		Run: func(cmd *cobra.Command, args []string) {
-			printVersion()
+			v, c, d := resolveVersionInfo()
+
+			// Alltid visa version
+			fmt.Printf("opsctl %s\n", v)
+
+			// Visa bara commit/built om de finns
+			if c != "" {
+				fmt.Printf("commit: %s\n", c)
+			}
+			if d != "" {
+				fmt.Printf("built:  %s\n", d)
+			}
 		},
 	}
 }
 
-func printVersion() {
+func resolveVersionInfo() (string, string, string) {
 	v := version
 	c := commitSHA
 	d := buildDate
 
-	// Fallback for binaries built via `go install ...@vX.Y.Z`
-	if bi, ok := debug.ReadBuildInfo(); ok {
-		// Module version (often v0.1.0 when installed with @v0.1.0)
-		if (v == "dev" || v == "") && bi.Main.Version != "" && bi.Main.Version != "(devel)" {
-			v = bi.Main.Version
-		}
+	bi, ok := debug.ReadBuildInfo()
+	if !ok {
+		return v, c, d
+	}
 
-		// VCS settings (revision/time)
-		for _, s := range bi.Settings {
-			switch s.Key {
-			case "vcs.revision":
-				if c == "none" || c == "" {
-					c = s.Value
-				}
-			case "vcs.time":
-				if d == "unknown" || d == "" {
-					d = s.Value
-				}
+	// Version fallback (när ldflags inte satt den)
+	if (v == "dev" || v == "" || v == "(devel)") && bi.Main.Version != "" && bi.Main.Version != "(devel)" {
+		v = bi.Main.Version
+	}
+
+	// Commit/time fallback (finns ibland, men inte alltid vid go install)
+	for _, s := range bi.Settings {
+		switch s.Key {
+		case "vcs.revision":
+			if c == "" {
+				c = s.Value
+			}
+		case "vcs.time":
+			if d == "" {
+				d = s.Value
 			}
 		}
 	}
 
-	fmt.Printf("opsctl %s\n", v)
-	fmt.Printf("commit: %s\n", c)
-	fmt.Printf("built:  %s\n", d)
+	return v, c, d
 }
