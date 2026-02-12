@@ -23,8 +23,7 @@ func NewInitCmd() *cobra.Command {
 			targetDir := filepath.Join(dir, serviceName)
 
 			if modulePath == "" {
-				// default module path convention
-				modulePath = fmt.Sprintf("github.com/davidperjans/%s", serviceName)
+				modulePath = serviceName
 			}
 
 			fmt.Println("opsctl init")
@@ -49,13 +48,17 @@ func NewInitCmd() *cobra.Command {
 			fmt.Println("Next:")
 			fmt.Printf("  cd %s\n", targetDir)
 			fmt.Println("  make run")
+			fmt.Println()
+			fmt.Println("Tip: set your real module path when you create the repo:")
+			fmt.Println("  go mod edit -module github.com/<you>/" + serviceName)
+			fmt.Println("  go mod tidy")
 			return nil
 		},
 	}
 
 	cmd.Flags().StringVar(&dir, "dir", ".", "Directory to create the service in")
 	cmd.Flags().BoolVar(&force, "force", false, "Overwrite existing files")
-	cmd.Flags().StringVar(&modulePath, "module", "", "Go module path (default: github.com/davidperjans/<service-name>)")
+	cmd.Flags().StringVar(&modulePath, "module", "", "Go module path (default: <service-name>)")
 
 	return cmd
 }

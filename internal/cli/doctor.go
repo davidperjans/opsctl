@@ -69,7 +69,6 @@ func NewDoctorCmd(r execx.Runner) *cobra.Command {
 				for _, m := range missingRequired {
 					fmt.Printf(" - %s: %s\n", m.Name, m.InstallHint)
 				}
-				// exit code 2 = "environment not ready"
 				os.Exit(2)
 			}
 
